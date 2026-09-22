@@ -2,8 +2,9 @@ package com.veracode.verademo.controller;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -128,9 +129,7 @@ public class ResetController {
 						String blabber = users[i].getUserName();
 						String listener = users[j].getUserName();
 
-						if (logger.isInfoEnabled()) {
-							logger.info("Adding " + listener + " as a listener of " + blabber);
-						}
+						logger.info("Adding " + listener + " as a listener of " + blabber);
 
 						listenersStatement.setString(1, blabber);
 						listenersStatement.setString(2, listener);
@@ -323,10 +322,7 @@ public class ResetController {
 
 		String[] lines = null;
 		StringBuffer sb = new StringBuffer();
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new FileReader(path));
-
+		try (BufferedReader br = Files.newBufferedReader(Path.of(path))) {
 			String line = br.readLine();
 			while (line != null) {
 				if (line.matches(regex)) {
@@ -344,14 +340,6 @@ public class ResetController {
 			lines = sb.toString().split(delimiter);
 		} catch (IOException ex) {
 			logger.error(ex);
-		} finally {
-			try {
-				if (br != null) {
-					br.close();
-				}
-			} catch (IOException ex) {
-				logger.error(ex);
-			}
 		}
 
 		return lines;
