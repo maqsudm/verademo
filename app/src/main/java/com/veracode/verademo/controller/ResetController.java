@@ -128,7 +128,9 @@ public class ResetController {
 						String blabber = users[i].getUserName();
 						String listener = users[j].getUserName();
 
-						logger.info("Adding " + listener + " as a listener of " + blabber);
+						if (logger.isInfoEnabled()) {
+							logger.info("Adding " + listener + " as a listener of " + blabber);
+						}
 
 						listenersStatement.setString(1, blabber);
 						listenersStatement.setString(2, listener);
