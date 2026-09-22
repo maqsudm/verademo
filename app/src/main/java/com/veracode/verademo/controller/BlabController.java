@@ -310,7 +310,9 @@ public class BlabController {
 				logger.info("Preparing the blabComments Prepared Statement");
 				blabComments = connect.prepareStatement(blabCommentsSql);
 				blabComments.setInt(1, blabid);
-				logger.info("Executing the blabComments Prepared Statement");
+				if (logger.isInfoEnabled()) {
+					logger.info("Executing the blabComments Prepared Statement");
+				}
 				ResultSet blabCommentsResults = blabComments.executeQuery();
 
 				// Store them in the model
@@ -370,7 +372,9 @@ public class BlabController {
 			return Utils.redirect("login?target=feed");
 		}
 
-		logger.info("User is Logged In - continuing... UA=" + httpRequest.getHeader("User-Agent") + " U=" + username);
+		if (logger.isInfoEnabled()) {
+			logger.info("User is Logged In - continuing... UA=" + httpRequest.getHeader("User-Agent") + " U=" + username);
+		}
 		Connection connect = null;
 		PreparedStatement addComment = null;
 		String addCommentSql = "INSERT INTO comments (blabid, blabber, content, timestamp) values (?, ?, ?, ?);";
@@ -441,7 +445,9 @@ public class BlabController {
 			return Utils.redirect("login?target=blabbers");
 		}
 
-		logger.info("User is Logged In - continuing... UA=" + httpRequest.getHeader("User-Agent") + " U=" + username);
+		if (logger.isInfoEnabled()) {
+			logger.info("User is Logged In - continuing... UA=" + httpRequest.getHeader("User-Agent") + " U=" + username);
+		}
 
 		Connection connect = null;
 		PreparedStatement blabberQuery = null;
@@ -460,7 +466,9 @@ public class BlabController {
 			connect = DriverManager.getConnection(Constants.create().getJdbcConnectionString());
 
 			// Find the Blabbers
-			logger.info(blabbersSql);
+			if (logger.isInfoEnabled()) {
+				logger.info(blabbersSql);
+			}
 			blabberQuery = connect.prepareStatement(blabbersSql);
 			blabberQuery.setString(1, username);
 			blabberQuery.setString(2, username);
@@ -520,15 +528,21 @@ public class BlabController {
 			return Utils.redirect("login?target=blabbers");
 		}
 
-		logger.info("User is Logged In - continuing... UA=" + httpRequest.getHeader("User-Agent") + " U=" + username);
+		if (logger.isInfoEnabled()) {
+			logger.info("User is Logged In - continuing... UA=" + httpRequest.getHeader("User-Agent") + " U=" + username);
+		}
 
 		if (command == null || command.isEmpty()) {
 			logger.info("Empty command provided...");
 			return nextView = Utils.redirect("login?target=blabbers");
 		}
 
-		logger.info("blabberUsername = " + blabberUsername);
-		logger.info("command = " + command);
+		if (logger.isInfoEnabled()) {
+			logger.info("blabberUsername = " + blabberUsername);
+		}
+		if (logger.isInfoEnabled()) {
+			logger.info("command = " + command);
+		}
 
 		Connection connect = null;
 		PreparedStatement action = null;
