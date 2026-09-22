@@ -2,9 +2,8 @@ package com.veracode.verademo.controller;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -21,7 +20,6 @@ import com.veracode.verademo.utils.Utils;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,8 +32,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ResetController {
 	private static final Logger logger = LogManager.getLogger("VeraDemo:ResetController");
 
-	@Autowired
-	ServletContext context;
+	private final ServletContext context;
+
+	public ResetController(ServletContext context) {
+		this.context = context;
+	}
 
 	private static User[] users = new User[] {
 			User.create("admin", "admin", "Thats Mr Administrator to you."),
@@ -69,7 +70,9 @@ public class ResetController {
 
 	@RequestMapping(value = "/reset", method = RequestMethod.GET)
 	public String showReset() {
-		logger.info("Entering showReset");
+		if (logger.isInfoEnabled()) {
+			logger.info("Entering showReset");
+		}
 
 		return "reset";
 	}
@@ -79,7 +82,9 @@ public class ResetController {
 			@RequestParam(value = "confirm", required = true) String confirm,
 			@RequestParam(value = "primary", required = false) String primary,
 			Model model) {
-		logger.info("Entering processReset");
+		if (logger.isInfoEnabled()) {
+			logger.info("Entering processReset");
+		}
 
 		Connection connect = null;
 		PreparedStatement usersStatement = null;
@@ -106,7 +111,9 @@ public class ResetController {
 			usersStatement = connect.prepareStatement(
 					"INSERT INTO users (username, password, password_hint, created_at, last_login, real_name, blab_name) values (?, ?, ?, ?, ?, ?, ?);");
 			for (int i = 0; i < users.length; i++) {
-				logger.info("Adding user " + users[i].getUserName());
+				if (logger.isInfoEnabled()) {
+					logger.info("Adding user " + users[i].getUserName());
+				}
 				usersStatement.setString(1, users[i].getUserName());
 				usersStatement.setString(2, users[i].getPassword());
 				usersStatement.setString(3, users[i].getPasswordHint());
@@ -190,7 +197,9 @@ public class ResetController {
 					// get the number or seconds until some time in the last 30 days.
 					long vary = rand.nextInt(30 * 24 * 3600);
 
-					logger.info("Adding a comment from " + username + " on blab ID " + String.valueOf(i));
+					if (logger.isInfoEnabled()) {
+						logger.info("Adding a comment from " + username + " on blab ID " + String.valueOf(i));
+					}
 					commentsStatement.setInt(1, i);
 					commentsStatement.setString(2, username);
 					commentsStatement.setString(3, comment);
@@ -322,7 +331,10 @@ public class ResetController {
 
 		String[] lines = null;
 		StringBuffer sb = new StringBuffer();
-		try (BufferedReader br = Files.newBufferedReader(Path.of(path))) {
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new FileReader(path));
+
 			String line = br.readLine();
 			while (line != null) {
 				if (line.matches(regex)) {
@@ -340,6 +352,14 @@ public class ResetController {
 			lines = sb.toString().split(delimiter);
 		} catch (IOException ex) {
 			logger.error(ex);
+		} finally {
+			try {
+				if (br != null) {
+					br.close();
+				}
+			} catch (IOException ex) {
+				logger.error(ex);
+			}
 		}
 
 		return lines;
